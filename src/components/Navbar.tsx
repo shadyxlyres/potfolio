@@ -2,14 +2,15 @@ import { useEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HoverLinks from "./HoverLinks";
 import { gsap } from "gsap";
-import { ScrollSmoother } from "gsap-trial/ScrollSmoother";
+import { ScrollSmoother } from "gsap-trial/ScrollSmoother"; // Ensure you have the right import
 import "./styles/Navbar.css";
 
 gsap.registerPlugin(ScrollSmoother, ScrollTrigger);
 export let smoother: ScrollSmoother;
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   useEffect(() => {
+    // Initialize ScrollSmoother
     smoother = ScrollSmoother.create({
       wrapper: "#smooth-wrapper",
       content: "#smooth-content",
@@ -20,37 +21,54 @@ const Navbar = () => {
       ignoreMobileResize: true,
     });
 
-    smoother.scrollTop(0);
-    smoother.paused(true);
+    smoother.scrollTop(0); // Scroll to top initially
+    smoother.paused(true); // Pause the smoother
 
-    let links = document.querySelectorAll(".header ul a");
+    const links = document.querySelectorAll(".header ul a");
     links.forEach((elem) => {
-      let element = elem as HTMLAnchorElement;
+      const element = elem as HTMLAnchorElement;
       element.addEventListener("click", (e) => {
         if (window.innerWidth > 1024) {
           e.preventDefault();
-          let elem = e.currentTarget as HTMLAnchorElement;
-          let section = elem.getAttribute("data-href");
-          smoother.scrollTo(section, true, "top top");
+          const section = element.getAttribute("data-href");
+          if (section) {
+            smoother.scrollTo(section, true, "top top"); // Smooth scroll to section
+          }
         }
       });
     });
+
+    // Refresh smoother on window resize
     window.addEventListener("resize", () => {
       ScrollSmoother.refresh(true);
     });
+
+    // Cleanup function to remove event listeners
+    return () => {
+      links.forEach((elem) => {
+        const element = elem as HTMLAnchorElement;
+        element.removeEventListener("click", (e) => {
+          e.preventDefault();
+        });
+      });
+      window.removeEventListener("resize", () => {
+        ScrollSmoother.refresh(true);
+      });
+    };
   }, []);
+
   return (
     <>
       <div className="header">
         <a href="/#" className="navbar-title" data-cursor="disable">
-          Ayush
+          Logo
         </a>
         <a
           href="mailto:example@mail.com"
           className="navbar-connect"
           data-cursor="disable"
         >
-          xlyresplays@gmail.com
+          example@mail.com
         </a>
         <ul>
           <li>
